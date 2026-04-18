@@ -16,9 +16,8 @@ jobs:
       - name: Prepare Capacitor
         run: |
           npm install @capacitor/core @capacitor/cli @capacitor/ios
-         npx cap init "Mala Counter" "com.mala.counter" --web-dir www
-
-
+          # Added the space in "Mala Counter" here
+          npx cap init "Mala Counter" "com.mala.counter" --web-dir www
           npx cap add ios
 
       - name: Compile App (No Signing)
