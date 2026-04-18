@@ -19,12 +19,18 @@ jobs:
           npx cap init "MalaCounter" "com.mala.counter" --web-dir www
           npx cap add ios
 
-      - name: Compile App
+      - name: Compile App (No Signing)
         run: |
           npx cap copy ios
           cd ios/App
-          # This builds an unsigned app perfect for TrollStore
-          xcodebuild -workspace App.xcworkspace -scheme App -configuration Debug -sdk iphoneos -derivedDataPath build
+          xcodebuild -workspace App.xcworkspace \
+            -scheme App \
+            -configuration Debug \
+            -sdk iphoneos \
+            -derivedDataPath build \
+            CODE_SIGNING_ALLOWED=NO \
+            CODE_SIGNING_REQUIRED=NO \
+            CODE_SIGN_IDENTITY=""
           
       - name: Package for TrollStore
         run: |
@@ -37,3 +43,4 @@ jobs:
         with:
           name: MalaCounter-IPA
           path: MalaCounter.ipa
+
