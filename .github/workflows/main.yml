@@ -1,4 +1,4 @@
-name: Build IPl
+name: Build IPA
 on: [push, workflow_dispatch]
 
 jobs:
