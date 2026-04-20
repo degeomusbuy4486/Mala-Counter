@@ -1,4 +1,4 @@
-name: Build IPA
+name: Build IPA and APK
 on: [push, workflow_dispatch]
 
 jobs:
@@ -15,42 +15,37 @@ jobs:
 
       - name: Prepare Capacitor
         run: |
-          npm install @capacitor/core @capacitor/cli @capacitor/ios cordova-res
+          npm install @capacitor/core @capacitor/cli @capacitor/ios @capacitor/android cordova-res
           npx cap init "Mala Counter" "com.mala.counter" --web-dir www
           npx cap add ios
-          
-          - name: Generate Native Icons
-          run: |
-          npx cordova-res ios --skip-config --copy --type icon
-          npx cap copy ios
+          npx cap add android
 
-
-
-      - name: Force Landscape Orientation
+      - name: Generate Native Icons
         run: |
-          plutil -remove UISupportedInterfaceOrientations ios/App/App/Info.plist
-          plutil -insert UISupportedInterfaceOrientations -xml "<array><string>UIInterfaceOrientationLandscapeLeft</string><string>UIInterfaceOrientationLandscapeRight</string></array>" ios/App/App/Info.plist
+          npx cordova-res ios --skip-config --copy --type icon
+          npx cordova-res android --skip-config --copy --type icon
+          npx cap copy
 
-      - name: Compile App (No Signing)
+      - name: Build Android APK
+        run: |
+          cd android
+          ./gradlew assembleDebug
+
+      - name: Compile iOS
         run: |
           cd ios/App
-          xcodebuild -workspace App.xcworkspace \
-            -scheme App \
-            -configuration Debug \
-            -sdk iphoneos \
-            -derivedDataPath build \
-            CODE_SIGNING_ALLOWED=NO \
-            CODE_SIGNING_REQUIRED=NO \
-            CODE_SIGN_IDENTITY=""
+          xcodebuild -workspace App.xcworkspace -scheme App -configuration Debug -sdk iphoneos -derivedDataPath build CODE_SIGNING_ALLOWED=NO CODE_SIGNING_REQUIRED=NO CODE_SIGN_IDENTITY=""
           
-      - name: Package for TrollStore
+      - name: Package IPA
         run: |
           mkdir -p Payload
           cp -r ios/App/build/Build/Products/Debug-iphoneos/App.app Payload/
           zip -r MalaCounter.ipa Payload
           
-      - name: Upload Artifact
+      - name: Upload Artifacts
         uses: actions/upload-artifact@v4
         with:
-          name: MalaCounter-IPA
-          path: MalaCounter.ipa
+          name: Mala-Counter-Builds
+          path: |
+            MalaCounter.ipa
+            android/app/build/outputs/apk/debug/app-debug.apk
