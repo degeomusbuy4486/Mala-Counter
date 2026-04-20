@@ -18,12 +18,13 @@ jobs:
           npm install @capacitor/core @capacitor/cli @capacitor/ios cordova-res
           npx cap init "Mala Counter" "com.mala.counter" --web-dir www
           npx cap add ios
-
-           - name: Generate Native Icons
-        run: |
-          # Added --type icon to tell the robot to skip looking for splash screens
+          
+          - name: Generate Native Icons
+          run: |
           npx cordova-res ios --skip-config --copy --type icon
           npx cap copy ios
+
+
 
       - name: Force Landscape Orientation
         run: |
