@@ -15,18 +15,23 @@ jobs:
 
       - name: Prepare Capacitor
         run: |
-          npm install @capacitor/core @capacitor/cli @capacitor/ios
-          # Added the space in "Mala Counter" here
+          npm install @capacitor/core @capacitor/cli @capacitor/ios cordova-res
           npx cap init "Mala Counter" "com.mala.counter" --web-dir www
           npx cap add ios
+
+      - name: Generate Native Icons
+        run: |
+          # The robot uses your manual 'resources' folder to make all icon sizes
+          npx cordova-res ios --skip-config --copy
+          npx cap copy ios
 
       - name: Force Landscape Orientation
         run: |
           plutil -remove UISupportedInterfaceOrientations ios/App/App/Info.plist
           plutil -insert UISupportedInterfaceOrientations -xml "<array><string>UIInterfaceOrientationLandscapeLeft</string><string>UIInterfaceOrientationLandscapeRight</string></array>" ios/App/App/Info.plist
+
       - name: Compile App (No Signing)
         run: |
-          npx cap copy ios
           cd ios/App
           xcodebuild -workspace App.xcworkspace \
             -scheme App \
