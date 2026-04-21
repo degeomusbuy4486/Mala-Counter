@@ -26,11 +26,21 @@ jobs:
           npx cap add ios
           npx cap add android
 
-      - name: Generate Native Icons
+      - name: Generate Native Icons (Both Platforms)
         run: |
           npx cordova-res ios --skip-config --copy --type icon
           npx cordova-res android --skip-config --copy --type icon
           npx cap copy
+
+      - name: Force Landscape (iOS)
+        run: |
+          plutil -remove UISupportedInterfaceOrientations ios/App/App/Info.plist
+          plutil -insert UISupportedInterfaceOrientations -xml "<array><string>UIInterfaceOrientationLandscapeLeft</string><string>UIInterfaceOrientationLandscapeRight</string></array>" ios/App/App/Info.plist
+
+      - name: Force Landscape (Android)
+        run: |
+          # This replaces the default orientation with landscape in the Android manifest
+          sed -i '' 's/android:name=".MainActivity"/android:name=".MainActivity" android:screenOrientation="landscape"/g' android/app/src/main/AndroidManifest.xml
 
       - name: Build Android APK
         run: |
@@ -55,4 +65,4 @@ jobs:
           name: Mala-Counter-Builds
           path: |
             MalaCounter.ipa
-            android/app/build/outputs/apk/debug/app-debug.apk
+            android/app/Mala-Counter.apk
