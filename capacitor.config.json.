@@ -3,6 +3,12 @@
   "appName": "Mala Counter",
   "webDir": "www",
   "bundledWebRuntime": false,
+  "ios": {
+    "preferredOrientation": "landscape"
+  },
+  "android": {
+    "preferredOrientation": "landscape"
+  },
   "assets": {
     "ios": {
       "input": "resources/icon.png"
