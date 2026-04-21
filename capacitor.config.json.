@@ -1,5 +1,14 @@
 {
   "appId": "com.mala.counter",
   "appName": "Mala Counter",
-  "webDir": "www"
+  "webDir": "www",
+  "bundledWebRuntime": false,
+  "assets": {
+    "ios": {
+      "input": "resources/icon.png"
+    },
+    "android": {
+      "input": "resources/icon.png"
+    }
+  }
 }
