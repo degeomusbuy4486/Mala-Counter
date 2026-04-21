@@ -28,8 +28,8 @@ jobs:
 
       - name: Generate Native Icons
         run: |
-          # This tool creates all required icon sizes from your 1024x1024 file
-          npx capacitor-assets generate --icon
+          # This generates native icons and splash screens using your resources folder
+          npx @capacitor/assets generate --ios --android
           npx cap copy
 
       - name: Force Landscape
