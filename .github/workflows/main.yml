@@ -28,24 +28,21 @@ jobs:
 
       - name: Generate Native Icons
         run: |
+          # This assumes you have created the capacitor.config.json pointing to 'resources/'
           npx @capacitor/assets generate --ios --android
           npx cap copy
 
-      - name: Force Landscape and Debug
+      - name: Force Landscape Configuration
         run: |
-          # Apply iOS settings
+          # iOS: Update Info.plist for iPhone and iPad
+          # We convert to xml1 first to ensure plutil can edit it safely
+          plutil -convert xml1 ios/App/App/Info.plist
           plutil -replace UISupportedInterfaceOrientations -xml "<array><string>UIInterfaceOrientationLandscapeLeft</string><string>UIInterfaceOrientationLandscapeRight</string></array>" ios/App/App/Info.plist
           plutil -replace UISupportedInterfaceOrientations~ipad -xml "<array><string>UIInterfaceOrientationLandscapeLeft</string><string>UIInterfaceOrientationLandscapeRight</string></array>" ios/App/App/Info.plist
-          plutil -replace UIRequiresFullScreen -bool YES ios/App/App/Info.plist
           
-          # Apply Android settings
+          # Android: Add screenOrientation to AndroidManifest.xml
+          # We target the .MainActivity tag
           sed -i '' 's/android:name=".MainActivity"/android:name=".MainActivity" android:screenOrientation="landscape"/g' android/app/src/main/AndroidManifest.xml
-          
-          # DEBUGGING: Print files to logs so we can see if they actually changed
-          echo "--- Checking Info.plist ---"
-          cat ios/App/App/Info.plist
-          echo "--- Checking AndroidManifest.xml ---"
-          cat android/app/src/main/AndroidManifest.xml
 
       - name: Build Android APK
         run: |
@@ -56,6 +53,8 @@ jobs:
       - name: Compile iOS
         run: |
           cd ios/App
+          # Clean the build before compiling
+          xcodebuild clean -workspace App.xcworkspace -scheme App
           xcodebuild -workspace App.xcworkspace -scheme App -configuration Debug -sdk iphoneos -derivedDataPath build CODE_SIGNING_ALLOWED=NO CODE_SIGNING_REQUIRED=NO CODE_SIGN_IDENTITY=""
           
       - name: Package IPA
