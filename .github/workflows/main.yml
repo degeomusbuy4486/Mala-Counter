@@ -15,8 +15,7 @@ jobs:
           
       - name: Inject Notification Script
         run: |
-          # This inserts your notification script before the </body> tag
-          sed -i '' 's|</body>|<script type="module">import { LocalNotifications } from "https://cdn.jsdelivr.net/npm/@capacitor/local-notifications@5.0.0/+esm"; async function showNotification() { await LocalNotifications.requestPermissions(); await LocalNotifications.schedule({ notifications: [{ title: "Mala Counter", body: "Time for your daily chant!", id: 1, schedule: { at: new Date(Date.now() + 1000 * 60) } }] }); } document.body.addEventListener("click", showNotification, { once: true });</script></body>|g' index.html
+          sed -i '' 's|</body>|<script type="module">import { LocalNotifications } from "https://cdn.jsdelivr.net/npm/@capacitor/local-notifications@5.0.0/+esm"; const checkInterval = setInterval(async () => { if (window.scaffolding \&\& window.scaffolding.vm \&\& window.scaffolding.vm.runtime) { clearInterval(checkInterval); window.scaffolding.vm.runtime.on("VAR_VALUE_UPDATE", async (event) => { if (event.name === "Malas Chanted Today:" \&\& event.value == 1) { await LocalNotifications.requestPermissions(); await LocalNotifications.schedule({ notifications: [{ title: "Mala Counter", body: "You reached 1 Mala! Keep going!", id: 1 }] }); } }); } }, 1000);</script></body>|g' www/index.html
 
       - name: Setup Java 17
         uses: actions/setup-java@v4
